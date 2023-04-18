@@ -29,21 +29,35 @@ switch ($action) {
         break;
 
     case 'detailFiche':
+        $lemois = filter_input(INPUT_POST, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_POST, 'visiteur', FILTER_SANITIZE_STRING);
-        $lesFraisForfait = $pdo->getLesFraisForfait($levisiteur, "202212");
-        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur, "202212");
-        include 'vues/v_validerDetail.php';
+        if (!$pdo->estPremierFraisMois($levisiteur, $lemois)) {
+            $error_message = "aucune fiche de frais n'est disponible pour le visiteur ce mois";
+            //possibilite d'inclure les parametres $visiteur et $mois dans le message
+    
+            $levisiteur = $pdo->GetFicheVisiteur();
+
+            $moisVisiteur = $pdo->getLesMoisVisiteur();
+            include 'vues/v_validerFrais.php';
+        } else {
+            $fraisForfaitVisiteur = $pdo->getLesFraisForfait(  $levisiteur, $lemois);
+            $fraisHorsForfaitVisiteur = $pdo->getLesFraisHorsForfait(  $levisiteur, $lemois);
+            include 'vues/v_validerDetail.php';
+        }
+        
         break;
 
     case 'modifierforfait':
+        $lemois = filter_input(INPUT_POST, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_GET, 'visiteur', FILTER_SANITIZE_STRING);
-        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur,"202212");
-        $pdo->majFraisForfait($levisiteur, "202212", $_POST);
+        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur,$lemois);
+        $pdo->majFraisForfait($levisiteur, $lemois, $_POST);
         break;
 
     case 'supprimerhorsforfait':
+        $lemois = filter_input(INPUT_GET, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_GET, 'visiteur', FILTER_SANITIZE_STRING);
-        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur,"202212");
+        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur,$lemois);
         var_dump($lesFraisHorsForfait);
         $nb=count($lesFraisHorsForfait);
         echo "<hr>".$nb."</hr>";
@@ -63,8 +77,9 @@ switch ($action) {
         break;
 
     case 'validerfiche':
+        $lemois = filter_input(INPUT_GET, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_GET, 'id_visiteur', FILTER_SANITIZE_STRING);
-        $pdo-> majEtatFicheFrais($levisiteur,"202212","VA"); //Modifie le statut
+        $pdo-> majEtatFicheFrais($levisiteur,$lemois,"VA"); //Modifie le statut
         include 'vues/v_statutValider.php';
         break;
 }
