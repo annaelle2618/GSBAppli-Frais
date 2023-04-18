@@ -13,9 +13,6 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-var_dump("test");
-error_reporting(E_ALL);
-ini_set("display_errors",1);
 require_once 'includes/fct.inc.php'; // empecher que le require se repete
 require_once 'includes/class.pdogsb.inc.php';
 session_start();
