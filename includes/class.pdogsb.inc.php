@@ -38,7 +38,7 @@
 
 class PdoGsb{
 
-    private static $serveur = 'mysql:host=127.0.0.1';
+    private static $serveur = 'mysql:host=127.0.0.1;port=4000';
     private static $bdd = 'dbname=gsb_frais';
     private static $user = 'root';
     private static $mdp = '';
@@ -55,7 +55,7 @@ class PdoGsb{
             PdoGsb::$serveur . ';' . PdoGsb::$bdd,
             PdoGsb::$user,
             PdoGsb::$mdp
-        );+
+        );
         PdoGsb::$monPdo->query('SET CHARACTER SET utf8');
     }
 
@@ -92,6 +92,20 @@ class PdoGsb{
         $requetePrepare->execute();
         
     }
+    public function getleJour($idfraishorsforfait){
+        $requetePrepare = PdoGsb::$monPdo->prepare(
+            'SELECT * 
+            FROM lignefraishorsforfait
+            WHERE id = :idfraishorsforfait '
+            );
+            $requetePrepare->bindParam(':idfraishorsforfait',$idfraishorsforfait, PDO::PARAM_STR);
+            $requetePrepare->execute();
+
+            
+        $date = $requetePrepare->fetch();
+        return $date['date'];
+
+    }
 
     public function getlibelle($id){
         $requetePrepare = PdoGsb::$monPdo->prepare(
@@ -124,7 +138,7 @@ class PdoGsb{
     public function GetFicheVisiteur()
     {
         $requetePrepare = PdoGsb::$monPdo->prepare(
-            'SELECT visiteur.id AS id, visiteur.nom AS nom, '
+            'SELECT distinct visiteur.id AS id, visiteur.nom AS nom, '
             . 'visiteur.prenom AS prenom '
             . 'FROM visiteur INNER JOIN fichefrais on visiteur.id = fichefrais.idvisiteur '
             . 'WHERE type = 1 '
@@ -138,14 +152,25 @@ class PdoGsb{
     public function getLesMoisVisiteur()
     {
         $requetePrepare = PdoGSB::$monPdo->prepare(
-            'SELECT fichefrais.mois AS mois FROM fichefrais '
+            'SELECT distinct fichefrais.mois AS mois FROM fichefrais '
             . 'ORDER BY mois desc'
         );
     
         $requetePrepare->execute();
         $moisVisiteur = $requetePrepare->fetchAll();
-        return $moisVisiteur;
+        $moisFormates = array();
+        
+        foreach ($moisVisiteur as $mois) {
+
+            $anneeFormat = substr($mois['mois'], 0, 4);
+            $moisFormat = substr($mois['mois'], 4, 2);
+            $joursFormat = substr($mois['mois'], 6, 2);
+            $moisFormates[$mois['mois']] = array('jours' => $joursFormat, 'mois' => $moisFormat, 'annee' => $anneeFormat);
+        }
+
+        return $moisFormates; // ['202212'=>[annee=>2022, mois=>12], '202301' => [annee=>2023, mois=>01] ... ]
     }
+
     /**
      * Retourne les informations d'un visiteur
      *
@@ -281,7 +306,7 @@ class PdoGsb{
     public function majFraisForfait($idVisiteur, $mois, $lesFrais)
     {
         $lesCles = array_keys($lesFrais);
-        foreach ($lesCles as $unIdFrais) {
+        foreach ($lesCles as $unIdFrais){
             $qte = $lesFrais[$unIdFrais];
             $requetePrepare = PdoGSB::$monPdo->prepare(
                 'UPDATE lignefraisforfait '
@@ -345,7 +370,7 @@ class PdoGsb{
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->execute();
-        if (!$requetePrepare->fetch()) {
+        if ($requetePrepare->fetch()) {
             $boolReturn = true;
         }
         return $boolReturn;
@@ -491,7 +516,7 @@ class PdoGsb{
             $mois = $laLigne['mois'];
             $numAnnee = substr($mois, 0, 4);
             $numMois = substr($mois, 4, 2);
-            $lesMois['$mois'] = array(
+            $lesMois['$mois'] = array(  
                 'mois' => $mois,
                 'numAnnee' => $numAnnee,
                 'numMois' => $numMois
@@ -553,4 +578,18 @@ class PdoGsb{
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->execute();
     }
+
+    public function getVisiteur(){
+        $requetePrepare= PdoGsb:: $monPdo->prepare(
+            'SELECT distinct visiteur.id AS id, visiteur.nom AS nom, 
+            visiteur.prenom AS prenom, visiteur.type AS id2
+            FROM visiteur INNER JOIN fichefrais
+            ON visiteur.id=fichefrais.idvisiteur
+            where visiteur.type = 1'
+        );
+        $requetePrepare->execute();
+        $visiteur=$requetePrepare->fetchAll();
+        return $visiteur;
+    }
+
 }

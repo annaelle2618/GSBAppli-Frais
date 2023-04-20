@@ -1,8 +1,12 @@
 <?php
 
 
-?>
-
+?></br>
+</br>
+Information concernant le visiteur:
+</br>
+Identifiant : <?= $_SESSION['user']?> </br>
+mois: <?= $_SESSION['mois']?> </br>
 <form method="post" action="index.php?uc=validerFrais&action=modifierforfait&visiteur=<?php echo $levisiteur ?>">
 
     <div class="panel panel-info">
@@ -78,8 +82,10 @@
             ?>
         </table>
         <input id="ok" type="submit" value="Supprimer" class="btn btn-success" role="button">
+        <input id="ok2" type="submit" value="Reporter" class="btn btn-success" role="button">
+
     </div>
 </form>
 <a href= "index.php?uc=validerFrais&action=validerfiche&id_visiteur=<?=$levisiteur?>">
-<button type= "button"  class="btn btn-primary">Valider la fiche </button>
+<button type= "button"  class="btn btn-primary">Valider la fiche </button> 
 </a>

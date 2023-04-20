@@ -8,7 +8,7 @@ if (isset($error_message)) echo"<div class=\"alert alert-danger\" role=\"alert\"
     <div class="form-group">
         <select name="mois" class="form-select" aria-label="Default select example">
         <?php foreach ($moisVisiteur as $unMoisVisiteur) { ?>
-                <option value="<?php echo $unMoisVisiteur['mois'] ?>"> <?php echo $unMoisVisiteur['mois'] ?></option>
+                <option value="<?php echo $unMoisVisiteur['annee'].$unMoisVisiteur['mois'] ?>"> <?php echo $unMoisVisiteur['mois'].'/'.$unMoisVisiteur['annee'] ?></option>
             <?php
             }
             ?>
@@ -21,7 +21,7 @@ if (isset($error_message)) echo"<div class=\"alert alert-danger\" role=\"alert\"
 
     <div class="form-group">
         <select name="visiteur"class="form-select" aria-label="Default select example">
-        <?php foreach ($visiteur as $unVisiteur) { ?>
+        <?php foreach ($levisiteur as $unVisiteur) { ?>
                 <option value="<?php echo $unVisiteur['id'] ?>"> <?php echo $unVisiteur['nom']."  ".$unVisiteur['prenom'] ?></option>
             <?php
             }

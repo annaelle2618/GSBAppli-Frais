@@ -31,12 +31,15 @@ $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
 switch ($action) {
 case 'saisirFrais':
     //PDO = requete sql : va donc se connecter à la base de donnée pour voir sil possede fiche de frais
-    if ($pdo->estPremierFraisMois($idVisiteur, $mois)) { //S'il trouve une fiche frais
+    if (!$pdo->estPremierFraisMois($idVisiteur, $mois)) { //S'il trouve une fiche frais
         $pdo->creeNouvellesLignesFrais($idVisiteur, $mois); // Cree
     }
     break;
+
 case 'validerMajFraisForfait':
+    // On recupère les données en POST du formulaire 
     $lesFrais = filter_input(INPUT_POST, 'lesFrais', FILTER_SANITIZE_STRING);
+    $lesFrais = $_REQUEST['lesFrais'];
     if (lesQteFraisValides($lesFrais)) {
         $pdo->majFraisForfait($idVisiteur, $mois, $lesFrais);
     } else {
@@ -44,6 +47,7 @@ case 'validerMajFraisForfait':
         include 'vues/v_erreurs.php';
     }
     break;
+    
 case 'validerCreationFrais':
     $dateFrais = filter_input(INPUT_POST, 'dateFrais', FILTER_SANITIZE_STRING); //dateFrais récuperer grace à l'attribut name de imput
     $libelle = filter_input(INPUT_POST, 'libelle', FILTER_SANITIZE_STRING);

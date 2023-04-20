@@ -8,15 +8,16 @@ case 'SaisirPayement':
         break;
 
     case 'FicheForfait':
-
+        $lemois = filter_input(INPUT_GET, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_POST, 'visiteur', FILTER_SANITIZE_STRING);
-        $lesFraisForfait = $pdo->getLesFraisForfait($levisiteur, "202212");
-        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur, "202212");
+        $lesFraisForfait = $pdo->getLesFraisForfait($levisiteur, $lemois);
+        $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($levisiteur, $lemois);
         include 'vues/v_FraisForfait.php';
         break;
 
     case 'modifierstatut':
+        $lemois = filter_input(INPUT_GET, 'mois', FILTER_SANITIZE_STRING);
         $levisiteur = filter_input(INPUT_GET, 'visiteur', FILTER_SANITIZE_STRING);
-        $pdo-> majEtatFicheFrais($levisiteur,"202212","MP");
+        $pdo-> majEtatFicheFrais($levisiteur,$lemois,"MP");
         include 'vues/v_modifierstatut.php';
 }
